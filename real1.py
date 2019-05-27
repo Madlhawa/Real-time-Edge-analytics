@@ -122,6 +122,10 @@ def lcd_string(message,line):
 def main():
   # Main program block
   now = datetime.datetime.now()
+  #Reading predicted data and changing date column data type
+  pdata = pd.read_csv('/home/pi/LABS/Asingment/Real-time-Edge-analytics/PredictionDataset.csv', skiprows=0)
+  pdata['Date'] = pd.to_datetime(pdata['Date'])
+
   # Initialise display
   lcd_init()
   
@@ -134,6 +138,10 @@ def main():
     humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
     publish.single("madhawa/temp/realtime", temperature, hostname=server)
     publish.single("madhawa/humid", humidity, hostname=server)
+    
+    mask = (pdata['Date'] = str(now.year)+"-"+str(now.month)+"-"+"1")
+    for index, row in poutput.iterrows():
+        print(row['Date'], row['PredictionUntilThisMonth'])
     
     if humidity is not None and temperature is not None:
         publish.single("madhawa/temp/diff", str(float(temperature) - 27.6031), hostname=server)
